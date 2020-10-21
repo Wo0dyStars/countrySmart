@@ -49,9 +49,17 @@ h1 {
 	color: rgba(0, 0, 0, .6);
 }
 
+.horizontal-line {
+	display: none;
+}
+
 @media only screen and (max-width: 500px) {
 	h1 {
 		font-size: 1.8rem;
 		padding: 1rem;
+	}
+
+	.horizontal-line {
+		display: block;
 	}
 }

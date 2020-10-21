@@ -201,8 +201,8 @@
 		display: block;
 		position: absolute;
 		z-index: 3000;
-		top: 86%;
-		height: 3%;
+		top: 80%;
+		height: 4%;
 		width: 100vw;
 		background-color: rgba(0, 0, 0, .4);
 		color: white;

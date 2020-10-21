@@ -58,4 +58,8 @@
 	.weather-container {
 		padding-bottom: 10rem;
 	}
+
+	.weather-data {
+		grid-template-columns: repeat(auto-fit, 24rem);
+	}
 }

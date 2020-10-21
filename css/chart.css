@@ -11,3 +11,9 @@
 	background-color: #203a43;
 	padding: 3rem 0;
 }
+
+@media only screen and (max-width: 500px) {
+	.bar-wrapper {
+		display: none;
+	}
+}
