@@ -87,7 +87,7 @@ const getLocalCountry = (latitude, longitude) => {
             </div>
         `)
 
-        $.getJSON("vendor/countryBorders.geo.json", (countryBorders) => {
+        $.getJSON("js/external/countryBorders.geo.json", (countryBorders) => {
             hover.styles = styles;
             hover.selectCountry = selectCountry;
             hover.selectedCountryCode = selectedCountryCode;
@@ -100,7 +100,7 @@ const getLocalCountry = (latitude, longitude) => {
 $("#selectCountry").on("click", function() {
     selectedCountryCode = $("#countries").val();
 
-    $.getJSON("vendor/countryBorders.geo.json", (countryBorders) => {
+    $.getJSON("js/external/countryBorders.geo.json", (countryBorders) => {
         selectCountry(selectedCountryCode, countryBorders);
     });
 })

@@ -1,6 +1,6 @@
 // Populate select tag
 export const populateSelect = () => {
-    $.getJSON("vendor/countryBorders.geo.json", (countryBorders) => {
+    $.getJSON("js/external/countryBorders.geo.json", (countryBorders) => {
         countryBorders.features.map(country => {
             const entry = country.properties.name + " (" + country.properties.iso_a2 + ")";
             $("#countries").append(

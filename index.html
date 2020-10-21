@@ -3,19 +3,22 @@
     <head>
         <title>Country Information On Leaflet Interactive Map</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="author" content="Peter Kertesz">
+        <meta name="description" content="This is a project aiming to deliver data about selected countries from multiple API sources.">
+        <meta name="keywords" content="API, country, jquery, ajax, php, curl, modal, css, html">
 
         <!-- Leaflet JS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
         
         <!-- Marker Cluster -->
-        <link rel="stylesheet" href="vendor/markerCluster/MarkerCluster.css">
-        <link rel="stylesheet" href="vendor/markerCluster/MarkerCluster.Design.css">
-        <script src="vendor/markerCluster/leaflet.markercluster.js"></script>
+        <link rel="stylesheet" href="js/external/markerCluster/MarkerCluster.css">
+        <link rel="stylesheet" href="js/external/markerCluster/MarkerCluster.Design.css">
+        <script src="js/external/markerCluster/leaflet.markercluster.js"></script>
         
         <!-- Spin -->
-        <script src="vendor/spin/spin.min.js"></script>
-        <script src="vendor/spin/leaflet.spin.min.js"></script>
+        <script src="js/external/spin/spin.min.js"></script>
+        <script src="js/external/spin/leaflet.spin.min.js"></script>
 
         <!-- Chart JS for Displaying charts -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
@@ -23,6 +26,7 @@
         <!-- Moment JS for handling dates -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
+        <!-- Jquery UI for Dialog -->
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
         <!-- Personal CSS files -->
@@ -72,7 +76,7 @@
             </div>
         </article>
         
-        <script src="vendor/jquery/jquery-2.2.3.min.js"></script>
+        <script src="js/external/jquery/jquery-2.2.3.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script type="module" src="js/index.js"></script>
     </body>

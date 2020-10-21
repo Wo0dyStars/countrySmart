@@ -20,7 +20,7 @@ export const hover = {
     },
 
     ActivateCountry: (e) => {
-        $.getJSON("vendor/countryBorders.geo.json", (countryBorders) => {
+        $.getJSON("js/external/countryBorders.geo.json", (countryBorders) => {
             hover.selectedCountryCode = e.target.feature.properties.iso_a2;
             hover.selectCountry(e.target.feature.properties.iso_a2, countryBorders);
         });
