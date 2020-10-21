@@ -1,0 +1,57 @@
+body {
+	margin: 0;
+	padding: 0;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+	display: none;
+}
+
+h1 {
+	text-align: center;
+	font-size: 3rem;
+}
+
+#countryMap {
+	display: block;
+	min-height: 95vh;
+	margin: 0 auto;
+	padding: 0;
+	border: 3px solid rgba(0, 0, 0, .1);
+	position: relative;
+	overflow: hidden;
+}
+
+.ui-dialog {
+	z-index: 5000;
+	position: absolute;
+	outline: 0 none;
+	padding: 0 !important;
+	border-radius: 10px;
+}
+
+#dialog > div {
+	display: flex;
+	flex-direction: column;
+}
+
+.ui-widget-header {
+	background: #b0de78;
+	border: 0;
+	color: #fff;
+	font-weight: normal;
+}
+
+.dialog-text {
+	font-weight: 700;
+	color: rgba(0, 0, 0, .6);
+}
+
+@media only screen and (max-width: 500px) {
+	h1 {
+		font-size: 1.8rem;
+		padding: 1rem;
+	}
+}

@@ -1,0 +1,44 @@
+#navigation {
+	background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+	height: 5vh;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#navigation label {
+	margin-right: 1rem;
+	font-size: 2rem;
+	text-transform: capitalize;
+}
+
+#countries {
+	height: 2rem;
+	outline: none;
+}
+
+#selectCountry {
+	margin-left: .3rem;
+	height: 2rem;
+	background-color: rgba(255, 255, 255, .5);
+	border: none;
+	color: #203a43;
+	cursor: pointer;
+	transition: all .4s ease;
+	outline: none;
+}
+
+#selectCountry:hover {
+	background-color: rgba(255, 255, 255, 1);
+}
+
+@media only screen and (max-width: 500px) {
+	#navigation {
+		padding-top: .2rem;
+	}
+
+	#navigation label {
+		font-size: 1rem;
+	}
+}
