@@ -61,7 +61,10 @@ const onLocationFound = (e) => {
     getLocalCountry(e.latitude, e.longitude);
 }
 
-const onLocationError = () => { $("#dialog").html("An error occurred finding your location. Please try again later!"); }
+const onLocationError = () => { 
+    $("#dialog").html("I was unable to detect your location on your device. I will assume that your are from England.");
+    getLocalCountry(55, -3);
+}
 
 map.on('locationerror', () => {
     if (!navigator.geolocation) {
