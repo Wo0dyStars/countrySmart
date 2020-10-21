@@ -61,9 +61,22 @@ const onLocationFound = (e) => {
     getLocalCountry(e.latitude, e.longitude);
 }
 
-const onLocationError = (e) => { $("#dialog").html("An error occurred finding your location: ", e.message); }
+const onLocationError = () => { $("#dialog").html("An error occurred finding your location. Please try again later!"); }
 
-map.on('locationerror', onLocationError);
+map.on('locationerror', () => {
+    if (!navigator.geolocation) {
+        onLocationError();
+    } else {
+        navigator.geolocation.getCurrentPosition((position) => {
+            L.marker(position.coords.latitude).addTo(map).bindPopup("This is your location here.");
+            L.circle(position.coords.longitude, 50000).addTo(map);
+            getLocalCountry(position.coords.latitude, position.coords.longitude);
+        }, (error) => {
+            onLocationError();
+        } )
+    }
+});
+
 map.on('locationfound', onLocationFound);
 
 map.locate({setView: true, maxZoom: 16});
