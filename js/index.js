@@ -28,7 +28,7 @@ let countriesDetails = "";
 ajax({purpose: "RestCountries"}, (countries) => (countriesDetails = countries), "php/request.php");
 
 $(document).ready(() => {
-    $(".button").on("click tap", function() {
+    $(".button").on("click", function() {
         $(".modal-wrapper").toggleClass("show hide");
         $(this).toggleClass("animated");
     });
