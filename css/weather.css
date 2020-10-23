@@ -4,6 +4,7 @@
 	margin: 0 auto;
 	display: flex;
 	justify-content: center;
+	background-color: white;
 }
 
 .weather-data {
@@ -52,6 +53,27 @@
 
 .weather-temperature {
 	font-size: 3rem;
+}
+
+#weather-forecast {
+	display: flex;
+	overflow-x: scroll;
+	background: rgba(0, 0, 0, .1);
+	font-weight: 700;
+	padding: 1rem;
+}
+
+#weather-forecast::-webkit-scrollbar {
+	width: 3px;
+	cursor: pointer;
+}
+
+#weather-forecast::-webkit-scrollbar-track {
+	background-color: rgba(0, 0, 0, .2);
+}
+
+#weather-forecast::-webkit-scrollbar-thumb {
+	background-color: #203a43;
 }
 
 @media only screen and (max-width: 500px) {

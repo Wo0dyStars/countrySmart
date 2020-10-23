@@ -1,18 +1,20 @@
 //************************************************** 
 // IMPORTS
 //************************************************** 
+import "../css/styles.css";
 import { styles } from "./styles.js";
 import { ajax } from "./utils.js";
 import { populateSelect, spinOptions, getColor } from "./data.js";
 import { hover } from "./hover.js";
 import { drawChart } from "./chart.js";
-import { displayWeatherData, displayCountryData, displayMiniData } from "./display.js";
+import { displayWeatherData, displayCountryData, displayMiniData, displayPhotos, displayWikipedia, displayCountryName } from "./display.js";
 
 //************************************************** 
 // API DETAILS
 //************************************************** 
 const openCageAPI = "63b9294f9ed64bdeb0c77b390070e3a2";
 const OpenWeatherAPIKey = "4d942565fae22651786edb5a63d30836";
+const pixabayAPIKey = "18817274-cb5f9ebbd5485d83091737054";
 
 populateSelect();
 
@@ -25,7 +27,7 @@ let countryLayer = {};
 let capitalMarker = {};
 let countriesDetails = "";
 
-ajax({purpose: "RestCountries"}, (countries) => (countriesDetails = countries), "php/request.php");
+ajax({purpose: "RestCountries"}, (countries) => {countriesDetails = countries}, "php/request.php");
 
 $(document).ready(() => {
     if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPod/i))){ 
@@ -63,7 +65,10 @@ L.tileLayer(tileURL, { attribution: tileAttr, maxZoom: 18 }).addTo(map);
 //************************************************** 
 const onLocationFound = (e) => {
     
-    L.marker(e.latlng).addTo(map).bindPopup("This is your location here.");
+    L.marker(e.latlng, { icon: L.ExtraMarkers.icon({
+        markerColor: 'violet',
+        shape: "penta"
+     }) }).addTo(map).bindPopup("This is your location here.");
     L.circle(e.latlng, 50000).addTo(map);
     getLocalCountry(e.latitude, e.longitude);
 }
@@ -102,11 +107,6 @@ const getLocalCountry = (latitude, longitude) => {
                 <div><span class="dialog-text">Country</span>: ${country.results[0].components.country}</div>
                 <div><span class="dialog-text">County</span>: ${country.results[0].components.county}</div>
                 <div><span class="dialog-text">City</span>: ${country.results[0].components.city}</div>
-                <hr>
-                <div>Your exact location is:</div>
-                <div><span class="dialog-text">Latitude</span>: ${country.results[0].geometry.lat}</div>
-                <div><span class="dialog-text">Longitude</span>: ${country.results[0].geometry.lng}</div>
-
             </div>
         `)
 
@@ -120,8 +120,8 @@ const getLocalCountry = (latitude, longitude) => {
     }, "php/request.php");
 };
 
-$("#selectCountry").on("click", function() {
-    selectedCountryCode = $("#countries").val();
+$("#countries").on("change", function() {
+    selectedCountryCode = $(this).val();
 
     $.getJSON("js/external/countryBorders.geo.json", (countryBorders) => {
         selectCountry(selectedCountryCode, countryBorders);
@@ -142,6 +142,12 @@ const selectCountry = (countryCode, data) => {
     map.fitBounds(countryLayer.getBounds(), { padding: [50, 50] });
 
     info.update(countryCode);
+    $("#countries").val(countryCode);
+
+    const selectedData = data.features.filter(feature => feature.properties.iso_a2 === countryCode );
+    const countryName= selectedData[0].properties.name;
+    getPhotos(countryName);
+
     map.spin(true, spinOptions);
     ajax({ countryCode, purpose: "receiveCountryCode" }, receiveCountryCode, "php/request.php");
 }
@@ -158,26 +164,19 @@ function createMarkers(cities) {
     if (markers != undefined) { map.removeLayer(markers); }
     if (capitalMarker != undefined) { map.removeLayer(capitalMarker); }
 
-    // Simple Coloured Icons from https://github.com/pointhi/leaflet-color-markers
-    const SimpleIcon = L.Icon.extend({
-        options: {
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        }
-    })
+    const goldIcon = L.ExtraMarkers.icon({ markerColor: 'orange', shape: "star" });
 
-    const SimpleIconURL = "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-";
-    const goldIcon = new SimpleIcon({ iconUrl: SimpleIconURL + "gold.png" });
+    const colorPopulations = {};
+    const chartValues = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    
+    // Include the largest city
+    colorPopulations[getColor(cities.results[0].population).name] = 1;
+    chartValues[getColor(cities.results[0].population).index] = 1;
 
     capitalMarker = L.marker(new L.latLng(cities.results[0].location.latitude, cities.results[0].location.longitude), {icon: goldIcon});
 
     markers = L.markerClusterGroup();
     
-    const colorPopulations = {};
-    const chartValues = {};
     for(let i = 1; i < cities.results.length; i++) {
         const latitude = cities.results[i].location.latitude;
         const longitude = cities.results[i].location.longitude;
@@ -196,7 +195,8 @@ function createMarkers(cities) {
         const currentColor = getColor(cities.results[i].population).name;
         if ( colorPopulations[currentColor] ) { colorPopulations[currentColor] += 1; } 
             else { colorPopulations[currentColor] = 1 };
-        const selectedIcon = new SimpleIcon({ iconUrl: SimpleIconURL + currentColor + ".png" });
+
+        const selectedIcon = L.ExtraMarkers.icon({ markerColor: getColor(cities.results[i].population).markerCode, shape: "square" });
         const marker = L.marker(new L.latLng(latitude, longitude), {icon: selectedIcon}).bindPopup(title);
 
         markers.addLayer(marker);
@@ -214,6 +214,7 @@ function createMarkers(cities) {
 
     getCountryInfo(fiveLargestCity);
     
+    console.log(chartValues);
     drawChart(chartValues);
 
     legend.update(colorPopulations);
@@ -229,15 +230,29 @@ function createMarkers(cities) {
 
 const getCountryInfo = (cities) => {
     if (cities) {
+
+        getWikipediaInfo(cities[0].lat, cities[0].lng);
         
         $(".weather-data").empty();
         for (let i = 0; i < Object.keys(cities).length; i++) {
-            const URL = `api.openweathermap.org/data/2.5/weather?lat=${cities[i].lat}&lon=${cities[i].lng}&appid=${OpenWeatherAPIKey}`;
-
+            const URL = `api.openweathermap.org/data/2.5/onecall?lat=${cities[i].lat}&lon=${cities[i].lng}&appid=${OpenWeatherAPIKey}`;
+            console.log(cities[i]);
             map.spin(true, spinOptions);
-            ajax({URL, purpose: "OpenWeatherAPI"}, (cities) => { map.spin(false); displayWeatherData(cities) }, "php/request.php");
+            ajax({URL, purpose: "OpenWeatherAPI"}, (c) => { map.spin(false); displayWeatherData(c, cities[i].city) }, "php/request.php");
         }
     }
+}
+
+const getPhotos = (country) => {
+    const URL = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${country}&image_type=photo`;
+
+    ajax({ URL, purpose: "pixabayAPI" }, (photos) => displayPhotos(photos), "php/request.php");
+}
+
+const getWikipediaInfo = (lat, lng) => {
+    const URL = `http://api.geonames.org/findNearbyWikipediaJSON?lat=${lat}&lng=${lng}&username=wo0dystars`;
+
+    ajax({ URL, purpose: "wikipediaAPI" }, (info) => displayWikipedia(info), "php/request.php");
 }
 
 //************************************************** 
@@ -256,15 +271,21 @@ info.update = function(countryCode) {
     if ( countryCode ) {
         if (!countriesDetails) {
             ajax({countryCode, purpose: "RestCountries"}, (country) => {
-                this._div.innerHTML = displayCountryData(country);
-                $("#modal-content").html(displayCountryData(country));
-                $(".countryInfo-mobile").html(displayMiniData(country));
+                if (!country) {
+                    alert("There is a problem with RestCountries API server. Please try again later!");
+                } else {
+                    this._div.innerHTML = displayCountryData(country);
+                    $("#modal-content").html(displayCountryName(country));
+                    $(".countryInfo-mobile").html(displayMiniData(country));
+                    $(".country-flag").html(`<img src="${country.flag}" />`);
+                }
             }, "php/request.php");
         } else {
             selectedCountry = countriesDetails.filter(country => country.alpha2Code === countryCode)[0];
             this._div.innerHTML = displayCountryData(selectedCountry);
-            $("#modal-content").html(displayCountryData(selectedCountry));
+            $("#modal-content").html(displayCountryName(selectedCountry));
             $(".countryInfo-mobile").html(displayMiniData(selectedCountry));
+            $(".country-flag").html(`<img src="${country.flag}" />`);
         }
     } 
 }
@@ -286,16 +307,19 @@ legend.onAdd = function(map) {
 }
 
 legend.update = function(colorPopulations = {}) {
-    const values = [0, 100000, 200000, 300000, 400000, 500000, 1000000, 5000000]; 
+    const values = [0, 20000, 50000, 100000, 500000, 1000000]; 
+    const valuesFormatted = [0, "20K", "50K", "100K", "500K", "1M"]; 
 
     this._div.innerHTML = "<h4>Populations</h4>";
     for (let i = 0; i < values.length; i++) {
         const { color, name } = getColor(values[i]+1);
         const currentNumber = colorPopulations[name] ? " (" + colorPopulations[name] + ") <br>" : " (0) <br>";
-        const currentLine = values[i+1] ? " - " + values[i+1] : "+ ";
+        const currentLine = values[i+1] ? " - " + valuesFormatted[i+1] : "+ ";
         this._div.innerHTML += `
-            <i style="background: ${color}"></i>
-            ${values[i] + currentLine + "<strong>" + currentNumber + "</strong>"}
+            <div class="legend-line">
+                <i style="background: ${color}"></i>
+                ${valuesFormatted[i] + currentLine + "<strong>" + currentNumber + "</strong>"}
+            </div>
         `;
     }
 }

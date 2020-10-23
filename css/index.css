@@ -1,4 +1,10 @@
+@font-face {
+	font-family: "GrandStander";
+	src: url("../public/font/Grandstander.ttf"), url("../public/font/GrandStander-italic.ttf");
+}
+
 body {
+	font-family: "GrandStander";
 	margin: 0;
 	padding: 0;
 	-ms-overflow-style: none;

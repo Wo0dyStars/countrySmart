@@ -1,44 +1,74 @@
-export const displayWeatherData = (weather) => {
+const sanitiseWeatherData = (rawWeatherData, timezone, isCurrent) => {
+    const weatherIcon = rawWeatherData.weather[0].icon;
 
-    const { name, timezone, visibility } = weather;
-    const localTime = new Date(weather.dt * 1000 + ( timezone * 1000 ));
-    const weatherIcon = weather.weather[0].icon;
-    const weatherIconImage = `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`;
-    const weatherDescription = weather.weather[0].description;
-    const windSpeed = weather.wind.speed;
-    const windDegree = weather.wind.deg;
-    const sunRise = new Date(weather.sys.sunrise * 1000);
-    const sunSet = new Date(weather.sys.sunset * 1000);
-    const feelsLike = Math.round(parseFloat(weather.main.feels_like) - 273.15);
-    const humidity = weather.main.humidity;
-    const pressure = weather.main.pressure;
-    const temperature = Math.round(parseFloat(weather.main.temp) - 273.15);
+    const weatherData = {
+        visibility: rawWeatherData.visibility,
+        localTime: new Date(rawWeatherData.dt * 1000 + ( timezone * 1000 )),
+        weatherIconImage: `http://openweathermap.org/img/wn/${weatherIcon}@2x.png`,
+        weatherDescription: rawWeatherData.weather[0].description,
+        windSpeed: rawWeatherData.wind_speed,
+        windDegree: rawWeatherData.wind_deg,
+        feelsLike: Math.round(parseFloat(rawWeatherData.feels_like) - 273.15),
+        humidity: rawWeatherData.humidity,
+        pressure: rawWeatherData.pressure,
+        temperature: Math.round(parseFloat(rawWeatherData.temp) - 273.15)
+    }
+
+    if ( isCurrent ) {
+        weatherData.sunRise = new Date(rawWeatherData.sunrise * 1000);
+        weatherData.sunSet = new Date(rawWeatherData.sunset * 1000);
+    }
+
+    return weatherData;
+    
+}
+
+export const displayWeatherData = (weather, name) => {
+
+    const currentData = sanitiseWeatherData(weather.current, weather.timezone_offset, true);
+
+    let weatherForecast = "";
+    for (let i = 0; i < 24; i++) {
+        const hourly = sanitiseWeatherData(weather.hourly[i], weather.timezone_offset, false);
+
+        weatherForecast += `
+            <div>
+                <div>${moment(hourly.localTime).format('HH:mm')}</div>
+                <div><img src="${hourly.weatherIconImage}" /></div>
+                <div>${hourly.temperature}&#176;</div>
+            </div>
+        `
+    }
 
     $(".weather-data").append(`
         <div id="weather">
             <div class="weather-line">
                 <div class="weather-group">
                     <h2>${name}</h2>
-                    <h1 class="weather-temperature">${temperature}&#176;</h1>
+                    <h1 class="weather-temperature">${currentData.temperature}&#176;</h1>
                 </div>
 
                 <div class="weather-group">
-                    <img src="${weatherIconImage}" />
-                    <span>${weatherDescription}</span>
+                    <img src="${currentData.weatherIconImage}" />
+                    <span>${currentData.weatherDescription}</span>
                 </div>
+            </div>
+
+            <div id="weather-forecast">
+                ${weatherForecast}
             </div>
             
             <div class="weather-description">
-                <h4>${moment(localTime).format('ddd, MMM, YYYY')}</h4>
-                <div>Sunrise: ${moment(sunRise).format('HH:mm')}</div>
-                <div>Sunset: ${moment(sunSet).format('HH:mm')}</div>
+                <h4>${moment(currentData.localTime).format('ddd, MMM, YYYY')}</h4>
+                <div>Sunrise: ${moment(currentData.sunRise).format('HH:mm')}</div>
+                <div>Sunset: ${moment(currentData.sunSet).format('HH:mm')}</div>
                 <hr>
                 <div class="weather-minors">
-                    <div>Wind: ${windSpeed} m/s, ${windDegree}&#176;</div>
-                    <div>Visibility: ${visibility} m</div>
-                    <div>Feels like: ${feelsLike}&#176;</div>
-                    <div>Humidity: ${humidity}%</div>
-                    <div>Pressure: ${pressure} hPa</div>
+                    <div>Wind: ${currentData.windSpeed} m/s, ${currentData.windDegree}&#176;</div>
+                    <div>Visibility: ${currentData.visibility} m</div>
+                    <div>Feels like: ${currentData.feelsLike}&#176;</div>
+                    <div>Humidity: ${currentData.humidity}%</div>
+                    <div>Pressure: ${currentData.pressure} hPa</div>
                 </div>
             </div>
         </div>
@@ -53,7 +83,7 @@ export const displayCountryData = (country) => {
                 <h4>${name}</h4>
                 <ul>
                     <li>Capital city: ${capital}</li>
-                    <li>
+                    <li class="medium-flag">
                         <img src="${flag}" alt="${name} national flag" />
                     </li>
                     <li>Area: ${area} km<sup>2</sup></li>
@@ -62,7 +92,13 @@ export const displayCountryData = (country) => {
             </article>
     `;
 
+    $(".background").css("background", `url("${flag}") no-repeat center/cover`);
+
     return controlPanel;
+}
+
+export const displayCountryName = (country) => {
+    return `<article><h4>${country.name}</h4></article>`;
 }
 
 export const displayMiniData = (country) => {
@@ -74,4 +110,49 @@ export const displayMiniData = (country) => {
     `;
 
     return miniPanel;
+}
+
+export const displayPhotos = (photos) => {
+    let photoGrid = "";
+    
+    let index = 0;
+    const randomPhotos = [];
+    while (( index < 10 ) && ( index < photos.hits.length )) {
+        const random = Math.floor(Math.random() * photos.hits.length);
+        
+        if (!randomPhotos.includes(random)) {
+            photoGrid += `
+                <div>
+                    <figure>
+                        <img src="${photos.hits[index].webformatURL}" />
+                        <figcaption>${photos.hits[index].tags}</figcaption>
+                    </figure>
+                </div>
+            `;
+
+            randomPhotos.push(random);
+        }
+        
+        index++;
+    }
+
+    $("#photos").html(photoGrid);
+}
+
+export const displayWikipedia = (info) => {
+
+    let wikiData = "";
+    for (let i = 0; i < Object.keys(info.geonames).length; i++) {
+        wikiData += `
+            <details id="wikidata" open>
+                <summary>${info.geonames[i].title}</summary>
+                <div class="wikidata-summary">${info.geonames[i].summary}</div>
+                <div class="wikidata-link"><a href="http://${info.geonames[i].wikipediaUrl}" target="_blank">You can find more information here.</a></div>
+            </details>
+        `
+    }
+
+    $("#wikipedia").html(`
+        ${wikiData}
+    `)
 }

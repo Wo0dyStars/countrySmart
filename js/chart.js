@@ -5,17 +5,17 @@ export const drawChart = (values) => {
     Chart.Legend.prototype.afterFit = function() {
         this.height = this.height + 50;
     };
-
+    console.log(values);
     new Chart($("#bar-chart"), {
         type: "bar",
         data: {
-            labels: ["0-100000", "100000-200000", "200000-300000", "300000-400000", "400000-500000", "500000-1000000", "1000000-5000000", "5000000+"],
+            labels: ["0-20K", "20K-50K", "50K-100K", "100K-500K", "500K-1M", "1M+"],
             datasets: [
                 {
                     label: "Population",
-                    backgroundColor: ["#3D3D3D", "#7B7B7B","#9C2BCB","#2AAD27","#2A81CB", "#CB2B3E", "#CB8427", "#CAC428"],
+                    backgroundColor: ["#3D3D3D", "#CB2B3E","#9C2BCB","#2AAD27","#2A81CB", "#CB8427"],
                     data: [
-                        values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7]
+                        values[0], values[1], values[2], values[3], values[4], values[5]
                     ]
                 }
             ]

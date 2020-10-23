@@ -45,6 +45,10 @@
 	opacity: 0.7;
 }
 
+.legend-line {
+	margin: .1rem 0;
+}
+
 @media only screen and (max-width: 500px) {
 	.countryInformation {
 		display: none;

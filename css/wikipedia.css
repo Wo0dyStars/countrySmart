@@ -1,0 +1,44 @@
+#wikipedia {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+	background-color: rgba(0, 0, 0, .02);
+
+	margin: 5rem auto;
+	padding: 3rem;
+}
+
+details {
+	transition: height 0.4s ease;
+	overflow: hidden;
+	padding: 0.7rem;
+	margin: .3rem;
+	background-color: white;
+	box-shadow: 0.2rem .5rem 1.5rem rgba(32, 58, 67, .3);
+	border-radius: 1rem;
+}
+
+details:not([open]) {
+	height: 2.1em;
+}
+
+details[open] {
+	height: 14em;
+}
+
+summary {
+	background-color: #203a43;
+	padding: .6rem;
+	color: white;
+}
+
+.wikidata-summary {
+	padding: 0.4rem;
+}
+
+.wikidata-link a {
+	margin-top: .2rem;
+	padding: 0.4rem;
+	text-decoration: none;
+	color: #203a43;
+	border: 1px dashed rgba(0, 0, 0, .1);
+}
