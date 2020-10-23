@@ -75,6 +75,10 @@ export const displayWeatherData = (weather, name) => {
     `)
 }
 
+const formatPopulation = (population) => {
+    return `~ ${(population / 1000000)}M`;
+}
+
 export const displayCountryData = (country) => {
     const { name, capital, flag, area, population } = country;
 
@@ -87,7 +91,7 @@ export const displayCountryData = (country) => {
                         <img src="${flag}" alt="${name} national flag" />
                     </li>
                     <li>Area: ${area} km<sup>2</sup></li>
-                    <li>Population: ${population} people</li>
+                    <li>Population: ${formatPopulation(population)}</li>
                 </ul>
             </article>
     `;

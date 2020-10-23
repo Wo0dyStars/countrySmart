@@ -36,21 +36,7 @@
         } else {
             $URL = $RestCountriesURL . "all";
         }
-    } 
-    
-    else if ( ( $_REQUEST["purpose"] === "OpenWeatherAPI" ) ){
-        $URL = $_REQUEST["URL"];
-    } 
-    
-    else if ( ( $_REQUEST["purpose"] === "ticketMasterAPI" ) ){
-        $URL = $_REQUEST["URL"];
-    }
-
-    else if ( ( $_REQUEST["purpose"] === "pixabayAPI" ) ){
-        $URL = $_REQUEST["URL"];
-    }
-
-    else if ( ( $_REQUEST["purpose"] === "wikipediaAPI" ) ){
+    } else {
         $URL = $_REQUEST["URL"];
     }
 

@@ -84,4 +84,8 @@
 	.weather-data {
 		grid-template-columns: repeat(auto-fit, 24rem);
 	}
+
+	#weather {
+		margin: 2rem 0.9rem;
+	}
 }

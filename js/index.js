@@ -157,7 +157,7 @@ const receiveCountryCode = (country) => {
     ajax({ countryCode, purpose: "createMarkers" }, createMarkers, "php/request.php");
 }
 
-function createMarkers(cities) {
+function createMarkers(places) {
 
     map.spin(false);
 
@@ -170,33 +170,33 @@ function createMarkers(cities) {
     const chartValues = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     
     // Include the largest city
-    colorPopulations[getColor(cities.results[0].population).name] = 1;
-    chartValues[getColor(cities.results[0].population).index] = 1;
+    colorPopulations[getColor(places.results[0].population).name] = 1;
+    chartValues[getColor(places.results[0].population).index] = 1;
 
-    capitalMarker = L.marker(new L.latLng(cities.results[0].location.latitude, cities.results[0].location.longitude), {icon: goldIcon});
+    capitalMarker = L.marker(new L.latLng(places.results[0].location.latitude, places.results[0].location.longitude), {icon: goldIcon});
 
     markers = L.markerClusterGroup();
     
-    for(let i = 1; i < cities.results.length; i++) {
-        const latitude = cities.results[i].location.latitude;
-        const longitude = cities.results[i].location.longitude;
+    for(let i = 1; i < places.results.length; i++) {
+        const latitude = places.results[i].location.latitude;
+        const longitude = places.results[i].location.longitude;
 
         const title = `
             <div>
-                <strong>City name:</strong> ${cities.results[i].name} <br>
-                <strong>Population:</strong> ${cities.results[i].population} people
+                <strong>City name:</strong> ${places.results[i].name} <br>
+                <strong>Population:</strong> ${places.results[i].population} people
             </div>
         `;
 
-        const currentIndex = getColor(cities.results[i].population).index;
+        const currentIndex = getColor(places.results[i].population).index;
         if ( chartValues[currentIndex] ) { chartValues[currentIndex] += 1; } 
             else { chartValues[currentIndex] = 1 };
 
-        const currentColor = getColor(cities.results[i].population).name;
+        const currentColor = getColor(places.results[i].population).name;
         if ( colorPopulations[currentColor] ) { colorPopulations[currentColor] += 1; } 
             else { colorPopulations[currentColor] = 1 };
 
-        const selectedIcon = L.ExtraMarkers.icon({ markerColor: getColor(cities.results[i].population).markerCode, shape: "square" });
+        const selectedIcon = L.ExtraMarkers.icon({ markerColor: getColor(places.results[i].population).markerCode, shape: "square" });
         const marker = L.marker(new L.latLng(latitude, longitude), {icon: selectedIcon}).bindPopup(title);
 
         markers.addLayer(marker);
@@ -206,9 +206,9 @@ function createMarkers(cities) {
     const fiveLargestCity = {};
     for(let i = 0; i < 5; i++) {
         fiveLargestCity[i] = {
-            city: cities.results[i].name,
-            lat: cities.results[i].location.latitude,
-            lng: cities.results[i].location.longitude
+            city: places.results[i].name,
+            lat: places.results[i].location.latitude,
+            lng: places.results[i].location.longitude
         }
     }
 
@@ -222,23 +222,23 @@ function createMarkers(cities) {
     capitalMarker.addTo(map).bindPopup(`
         <div>
             <h4>This is the largest city</h4>
-            <strong>City name:</strong> ${cities.results[0].name} <br>
-            <strong>Population:</strong> ${cities.results[0].population} people
+            <strong>City name:</strong> ${places.results[0].name} <br>
+            <strong>Population:</strong> ${places.results[0].population} people
         </div>
     `).openPopup();
 }
 
-const getCountryInfo = (cities) => {
-    if (cities) {
+const getCountryInfo = (places) => {
+    if (places) {
 
-        getWikipediaInfo(cities[0].lat, cities[0].lng);
+        getWikipediaInfo(places[0].lat, places[0].lng);
         
         $(".weather-data").empty();
-        for (let i = 0; i < Object.keys(cities).length; i++) {
-            const URL = `api.openweathermap.org/data/2.5/onecall?lat=${cities[i].lat}&lon=${cities[i].lng}&appid=${OpenWeatherAPIKey}`;
-            console.log(cities[i]);
+        for (let i = 0; i < Object.keys(places).length; i++) {
+            const URL = `api.openweathermap.org/data/2.5/onecall?lat=${places[i].lat}&lon=${places[i].lng}&appid=${OpenWeatherAPIKey}`;
+            console.log(places[i]);
             map.spin(true, spinOptions);
-            ajax({URL, purpose: "OpenWeatherAPI"}, (c) => { map.spin(false); displayWeatherData(c, cities[i].city) }, "php/request.php");
+            ajax({URL, purpose: "OpenWeatherAPI"}, (c) => { map.spin(false); displayWeatherData(c, places[i].city) }, "php/request.php");
         }
     }
 }
@@ -283,10 +283,9 @@ info.update = function(countryCode) {
         } else {
             selectedCountry = countriesDetails.filter(country => country.alpha2Code === countryCode)[0];
             this._div.innerHTML = displayCountryData(selectedCountry);
-            alert(country);
             $("#modal-content").html(displayCountryName(selectedCountry));
             $(".countryInfo-mobile").html(displayMiniData(selectedCountry));
-            $(".country-flag").html(`<img src="${country.flag}" />`);
+            $(".country-flag").html(`<img src="${selectedCountry.flag}" />`);
         }
     } 
 }

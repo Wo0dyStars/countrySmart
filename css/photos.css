@@ -40,3 +40,14 @@ figcaption {
 	padding: 1rem;
 	top: -4.5rem;
 }
+
+@media only screen and (max-width: 500px) {
+	figure {
+		opacity: 1;
+	}
+
+	figure:hover {
+		opacity: 1;
+		transform: 0;
+	}
+}
