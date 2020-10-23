@@ -283,6 +283,7 @@ info.update = function(countryCode) {
         } else {
             selectedCountry = countriesDetails.filter(country => country.alpha2Code === countryCode)[0];
             this._div.innerHTML = displayCountryData(selectedCountry);
+            alert(country);
             $("#modal-content").html(displayCountryName(selectedCountry));
             $(".countryInfo-mobile").html(displayMiniData(selectedCountry));
             $(".country-flag").html(`<img src="${country.flag}" />`);
