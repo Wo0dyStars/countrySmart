@@ -64,7 +64,7 @@
 }
 
 .marker-cluster div::after {
-	content: " cities";
+	content: " places";
 	font-style: italic;
 	color: rgba(255, 255, 255, .8);
 }

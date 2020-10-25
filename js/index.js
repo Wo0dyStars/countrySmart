@@ -159,6 +159,13 @@ const receiveCountryCode = (country) => {
 
 function createMarkers(places) {
 
+    // The API gives back largest countries or states in united areas, such as USA or UK
+    // Therefore England and New York must be excluded.
+    let startingIndex = 0;
+    if ( places.results[0].name === "England" || places.results[0].name === "New York" || places.results[0].name === "Canada" ) {
+        startingIndex = 1;
+    }
+
     map.spin(false);
 
     if (markers != undefined) { map.removeLayer(markers); }
@@ -170,21 +177,21 @@ function createMarkers(places) {
     const chartValues = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     
     // Include the largest city
-    colorPopulations[getColor(places.results[0].population).name] = 1;
-    chartValues[getColor(places.results[0].population).index] = 1;
+    colorPopulations[getColor(places.results[startingIndex].population).name] = 1;
+    chartValues[getColor(places.results[startingIndex].population).index] = 1;
 
-    capitalMarker = L.marker(new L.latLng(places.results[0].location.latitude, places.results[0].location.longitude), {icon: goldIcon});
+    capitalMarker = L.marker(new L.latLng(places.results[startingIndex].location.latitude, places.results[startingIndex].location.longitude), {icon: goldIcon});
 
     markers = L.markerClusterGroup();
     
-    for(let i = 1; i < places.results.length; i++) {
+    for(let i = startingIndex + 1; i < places.results.length; i++) {
         const latitude = places.results[i].location.latitude;
         const longitude = places.results[i].location.longitude;
 
         const title = `
             <div>
                 <strong>City name:</strong> ${places.results[i].name} <br>
-                <strong>Population:</strong> ${places.results[i].population} people
+                <strong>Population:</strong> ${formatPopulation(places.results[i].population)}
             </div>
         `;
 
@@ -204,7 +211,7 @@ function createMarkers(places) {
 
     // Five largest city for Weather API
     const fiveLargestCity = {};
-    for(let i = 0; i < 5; i++) {
+    for(let i = startingIndex; i < startingIndex + 5; i++) {
         fiveLargestCity[i] = {
             city: places.results[i].name,
             lat: places.results[i].location.latitude,
@@ -212,9 +219,8 @@ function createMarkers(places) {
         }
     }
 
-    getCountryInfo(fiveLargestCity);
+    getCountryInfo(fiveLargestCity, startingIndex);
     
-    console.log(chartValues);
     drawChart(chartValues);
 
     legend.update(colorPopulations);
@@ -222,21 +228,23 @@ function createMarkers(places) {
     capitalMarker.addTo(map).bindPopup(`
         <div>
             <h4>This is the largest city</h4>
-            <strong>City name:</strong> ${places.results[0].name} <br>
-            <strong>Population:</strong> ${places.results[0].population} people
+            <strong>City name:</strong> ${places.results[startingIndex].name} <br>
+            <strong>Population:</strong> ${formatPopulation(places.results[startingIndex].population)}
         </div>
     `).openPopup();
 }
 
-const getCountryInfo = (places) => {
-    if (places) {
+const formatPopulation = (population) => {
+    return ( population > 1000000 ) ? `~ ${Math.round(population / 1000000)}M` : `~ ${Math.round(population / 1000)}K`;
+};
 
-        getWikipediaInfo(places[0].lat, places[0].lng);
+const getCountryInfo = (places, startingIndex) => {
+    if (places) {
+        getWikipediaInfo(places[startingIndex].lat, places[startingIndex].lng);
         
         $(".weather-data").empty();
-        for (let i = 0; i < Object.keys(places).length; i++) {
+        for (let i = startingIndex; i < startingIndex + Object.keys(places).length; i++) {
             const URL = `api.openweathermap.org/data/2.5/onecall?lat=${places[i].lat}&lon=${places[i].lng}&appid=${OpenWeatherAPIKey}`;
-            console.log(places[i]);
             map.spin(true, spinOptions);
             ajax({URL, purpose: "OpenWeatherAPI"}, (c) => { map.spin(false); displayWeatherData(c, places[i].city) }, "php/request.php");
         }
